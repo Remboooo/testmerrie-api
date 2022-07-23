@@ -101,7 +101,7 @@ class OmeApi:
         return {"streams": result, "dbg": dbg}
 
     def create_ome_headers(self):
-        return {"Authorization": f"Basic {base64.b64encode(self.ome_password).decode()}"}
+        return {"Authorization": f"Basic {base64.b64encode(self.ome_password.encode()).decode()}"}
 
 
 API = OmeApi()
