@@ -4,3 +4,6 @@ ovenMediaEngine:
   webRtcPublishUrl: "wss://bam.bad-bit.net/ome"
   llHlsPublishUrl: "https://bam.bad-bit.net/ome"
   thumbnailPublishUrl: "https://bam.bad-bit.net/ome"
+discord:
+  clientId: "... my client id ..."
+  clientSecret: "... my client secret ..."

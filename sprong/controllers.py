@@ -27,7 +27,7 @@ def json_endpoint(func):
         try:
             result = func(self, environ, start_response, *args, **kwargs)
             start_response('200 OK', [('Content-Type', 'application/json; charset=utf-8')])
-            json.dumps(result).encode('utf-8')
+            return json.dumps(result).encode('utf-8')
         except Exception as e:
             start_response('500 oops', [('Content-Type', 'application/json; charset=utf-8')])
             return json.dumps({"message": str(e)}).encode('utf-8')
