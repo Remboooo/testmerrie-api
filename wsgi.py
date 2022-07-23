@@ -14,8 +14,8 @@ def combine_dicts(*dicts):
 
 class OmeApi:
     def __init__(self):
-        file = os.path.join(SCRIPT_DIR, "config.yaml")
-        self.config = yaml.safe_load(file)
+        with open(os.path.join(SCRIPT_DIR, "config.yaml"), 'r') as f:
+            self.config = yaml.safe_load(f)
         ome_config = self.config["ovenMediaEngine"]
         self.ome_api = ome_config["apiUrl"]
         self.ome_password = ome_config["apiPassword"]
