@@ -2,6 +2,7 @@ import functools
 import json
 import logging
 import re
+import sys
 from collections import defaultdict
 
 LOGGER = logging.getLogger(__name__)

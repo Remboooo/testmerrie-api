@@ -2,11 +2,14 @@ import base64
 
 import requests
 
+from sprong import sprongbean, SprongBeanRepo
 
+
+@sprongbean
 class OmeApi:
-    def __init__(self, api_url, api_password):
-        self.ome_api = api_url
-        self.ome_password = api_password
+    def __init__(self, ome_config):
+        self.ome_api = ome_config["apiUrl"]
+        self.ome_password = ome_config["apiPassword"]
         self.ome_headers = self.create_ome_headers()
 
     def create_ome_headers(self):
