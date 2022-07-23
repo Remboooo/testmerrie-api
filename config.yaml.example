@@ -1,0 +1,6 @@
+ovenMediaEngine:
+  apiUrl: "http://127.0.0.1:48081"
+  apiPassword: "... my password ..."
+  webRtcPublishUrl: "wss://bam.bad-bit.net/ome"
+  llHlsPublishUrl: "https://bam.bad-bit.net/ome"
+  thumbnailPublishUrl: "https://bam.bad-bit.net/ome"
