@@ -3,7 +3,7 @@ import os
 
 import yaml
 
-from controllers.auth import DiscordAuthController
+from controllers.auth import AuthController
 from controllers.streams import LegacyApi, StreamsController
 from sprong import SprongApplication
 from sprong.beans import SprongBeanRepo
@@ -28,7 +28,7 @@ class Bami(SprongApplication):
 
         self.add_controller(self.repo.get(LegacyApi))
         self.add_controller(self.repo.get(StreamsController))
-        self.add_controller(self.repo.get(DiscordAuthController))
+        self.add_controller(self.repo.get(AuthController))
 
 
 application = Bami()

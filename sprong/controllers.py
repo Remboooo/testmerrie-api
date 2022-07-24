@@ -9,6 +9,25 @@ LOGGER = logging.getLogger(__name__)
 
 MAPPINGS = defaultdict(list)
 
+DEFAULT_HEADERS = [
+    ('Access-Control-Allow-Origin', '*'),
+    ('Access-Control-Allow-Headers', '*')
+]
+
+JSON_HEADERS = [
+    ('Content-Type', 'application/json; charset=utf-8')
+]
+
+
+class BadRequest(Exception):
+    def __init__(self, msg):
+        super().__init__(msg)
+
+
+class Unauthorized(Exception):
+    def __init__(self, msg):
+        super().__init__(msg)
+
 
 def mapping(route):
     class Decorator:
@@ -24,18 +43,14 @@ def mapping(route):
 def json_endpoint(func):
     @functools.wraps(func)
     def wrapper(self, environ, start_response, *args, **kwargs):
-        try:
-            result = func(self, environ, start_response, *args, **kwargs)
-            start_response('200 OK', [('Content-Type', 'application/json; charset=utf-8')])
-            return json.dumps(result).encode('utf-8')
-        except Exception as e:
-            start_response('500 oops', [('Content-Type', 'application/json; charset=utf-8')])
-            return json.dumps({"message": str(e)}).encode('utf-8')
+        result = func(self, environ, start_response, *args, **kwargs)
+        start_response('200 OK', DEFAULT_HEADERS + JSON_HEADERS)
+        return json.dumps(result).encode('utf-8')
     return wrapper
 
 
-class Controller:
-    def get_url_patterns(self):
+class SprongController:
+    def get_url_pattern_mappings(self):
         return MAPPINGS[self.__class__]
 
 
@@ -54,7 +69,7 @@ class SprongApplication:
         ])
 
     def not_found(self, environ, start_response):
-        start_response('404 Not Found', [('Content-Type', 'application/json; charset=utf-8')])
+        start_response('404 Not Found', DEFAULT_HEADERS + JSON_HEADERS)
         return json.dumps({"message": "The requested endpoint does not exist"})
 
     def handle(self, environ, start_response):
@@ -65,11 +80,23 @@ class SprongApplication:
 
             for pattern, controller, handler in self.mappings:
                 if pattern.fullmatch(path):
-                    return handler(controller, environ, start_response)
+                    if environ['REQUEST_METHOD'] == 'OPTIONS':
+                        return self.preflight_response(environ, start_response)
+                    else:
+                        return handler(controller, environ, start_response)
 
             return self.not_found(environ, start_response)
 
+        except BadRequest as e:
+            start_response('400 Bad Request', DEFAULT_HEADERS + JSON_HEADERS)
+            return json.dumps({"message": str(e)}).encode('utf-8')
+        except Unauthorized as e:
+            start_response('401 Unauthorized', DEFAULT_HEADERS + JSON_HEADERS)
+            return json.dumps({"message": str(e)}).encode('utf-8')
         except Exception as e:
             LOGGER.error("Handler threw unhandled exception", exc_info=sys.exc_info())
-            start_response('500 oops', [('Content-Type', 'application/json; charset=utf-8')])
+            start_response('500 Internal Server Error', DEFAULT_HEADERS + JSON_HEADERS)
             return json.dumps({"message": str(e)}).encode('utf-8')
+
+    def preflight_response(self, environ, start_response):
+        start_response('204 OK', DEFAULT_HEADERS + JSON_HEADERS)

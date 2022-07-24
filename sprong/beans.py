@@ -33,6 +33,8 @@ class SprongBeanRepo:
         for name in names:
             if name in self.singletons:
                 return self.singletons[name]
+            if path and name in path:
+                raise BeanInstantiationException(f"Circular dependency: {' / '.join(names)}", path)
 
         creator = None
         creator_name = None

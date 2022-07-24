@@ -1,5 +1,6 @@
 from api.ome import OmeApi
-from sprong import Controller, mapping, json_endpoint, sprongbean
+from auth.discordauth import DiscordAuth
+from sprong import SprongController, mapping, json_endpoint, sprongbean
 
 
 def combine_dicts(*dicts):
@@ -7,7 +8,7 @@ def combine_dicts(*dicts):
 
 
 @sprongbean
-class LegacyApi(Controller):
+class LegacyApi(SprongController):
     def __init__(self, ome_api: OmeApi):
         super().__init__()
         self.ome_api = ome_api
@@ -15,16 +16,18 @@ class LegacyApi(Controller):
     @mapping('^/?$')
     @json_endpoint
     def serve(self, env, start_response):
+        # TODO force auth on this endpoint when OG bam.bad-bit.net is replaced
         r = self.ome_api.get("vhosts/default/apps/bam/streams")
         r2 = self.ome_api.get("vhosts/default/apps/app/streams")
         return [f"bam/{stream}" for stream in r] + ["app/twitch" for stream in r2]
 
 
 @sprongbean
-class StreamsController(Controller):
-    def __init__(self, ome_config, ome_api: OmeApi):
+class StreamsController(SprongController):
+    def __init__(self, ome_config, ome_api: OmeApi, discord_auth: DiscordAuth):
         super().__init__()
         self.ome_api = ome_api
+        self.discord_auth = discord_auth
         self.base_webrtc = ome_config["webRtcPublishUrl"]
         self.base_llhls = ome_config["llHlsPublishUrl"]
         self.base_thumbs = ome_config["thumbnailPublishUrl"]
@@ -32,6 +35,8 @@ class StreamsController(Controller):
     @mapping('^/v1/streams/?$')
     @json_endpoint
     def serve(self, env, start_response):
+        self.discord_auth.authenticate(env)
+
         dbg = []
         result = {}
 
