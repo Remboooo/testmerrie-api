@@ -34,4 +34,4 @@ class Bami(SprongApplication):
 application = Bami()
 
 if __name__ == '__main__':
-    print(application({"PATH_INFO": "/v1/discord-auth"}, lambda *args: print(args)))
+    print(application({"REQUEST_METHOD": "GET", "PATH_INFO": "/v1/auth"}, lambda *args: print(args)))
