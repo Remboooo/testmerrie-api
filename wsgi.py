@@ -4,7 +4,7 @@ import os
 import yaml
 
 from controllers.auth import AuthController
-from controllers.streams import LegacyApi, StreamsController
+from controllers.streams import StreamsController
 from sprong import SprongApplication
 from sprong.beans import SprongBeanRepo
 
@@ -26,12 +26,13 @@ class Bami(SprongApplication):
         self.repo.register(ome_config, name="ome_config")
         self.repo.register(discord_config, name="discord_config")
 
-        self.add_controller(self.repo.get(LegacyApi))
         self.add_controller(self.repo.get(StreamsController))
         self.add_controller(self.repo.get(AuthController))
 
 
+logging.basicConfig(level=logging.DEBUG)
 application = Bami()
 
 if __name__ == '__main__':
-    print(application({"REQUEST_METHOD": "GET", "PATH_INFO": "/v1/auth"}, lambda *args: print(args)))
+    print(application({"REQUEST_METHOD": "GET", "PATH_INFO": "/v1/auth/"}, lambda *args: print(args)))
+    print(application({"REQUEST_METHOD": "GET", "PATH_INFO": "/v1/auth/", "QUERY_STRING": "token=bla"}, lambda *args: print(args)))

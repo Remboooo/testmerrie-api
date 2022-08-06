@@ -1,18 +1,20 @@
 import datetime
+import secrets
 from dataclasses import dataclass
 
 import requests
 from requests import HTTPError
 
-from sprong import sprongbean, Unauthorized
+from sprong import sprongbean, Unauthorized, Request
 
 
 @dataclass
 class CachedToken:
-    token: str
+    discord_token: str
     expires: datetime.datetime
     user: dict
     member_of: dict
+    testmerrie_token: str
 
 
 @sprongbean
@@ -36,21 +38,24 @@ class DiscordAuth:
         result.raise_for_status()
         return result.json()
 
-    def authenticate(self, env):
-        token = env.get("HTTP_AUTHORIZATION")
-        if not token:
+    def authenticate(self, req: Request):
+        discord_token = req.authorization
+        tm_token = req.get_query_param("token")
+        if not discord_token and not tm_token:
             raise Unauthorized("Missing Authorization header")
 
         self.purge_old_tokens()
-        auth = self.token_cache.get(token)
+        auth = self.token_cache.get(discord_token) or self.token_cache.get(tm_token)
         if auth is not None:
             return auth
+        elif discord_token is None:
+            raise Unauthorized("Unknown token")
 
-        me = self.discord_get("/users/@me", token)
+        me = self.discord_get("/users/@me", discord_token)
         member_of = {}
         for guild in self.allow_guilds.keys():
             try:
-                member_of[guild] = self.discord_get(f"/users/@me/guilds/{guild}/member", token)
+                member_of[guild] = self.discord_get(f"/users/@me/guilds/{guild}/member", discord_token)
             except HTTPError:
                 pass
 
@@ -65,10 +70,12 @@ class DiscordAuth:
             raise Unauthorized("You don't have any of the required roles in any of the allowed Discord guilds")
 
         auth = CachedToken(
-            token=token,
+            discord_token=discord_token,
             expires=datetime.datetime.utcnow() + datetime.timedelta(seconds=self.auth_cache_seconds),
             user=me,
-            member_of=member_of
+            member_of=member_of,
+            testmerrie_token=secrets.token_urlsafe(16)
         )
-        self.token_cache[token] = auth
+        self.token_cache[discord_token] = auth
+        self.token_cache[auth.testmerrie_token] = auth
         return auth
