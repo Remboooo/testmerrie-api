@@ -20,7 +20,8 @@ class StreamsController(SprongController):
     @mapping('^/v1/streams/?$')
     @json_endpoint
     def serve(self, req: Request, start_response):
-        self.discord_auth.authenticate(req)
+        auth = self.discord_auth.authenticate(req)
+        token_str = f"token={auth.testmerrie_token}"
 
         dbg = []
         result = {}
@@ -28,10 +29,10 @@ class StreamsController(SprongController):
         def get_outputs(app, stream, publisher):
             return {
                 "webrtc": {
-                    "webrtc-udp": f"{self.base_webrtc}/{app}/{stream}",
-                    "webrtc-tcp": f"{self.base_webrtc}/{app}/{stream}?transport=tcp",
+                    "webrtc-udp": f"{self.base_webrtc}/{app}/{stream}?{token_str}",
+                    "webrtc-tcp": f"{self.base_webrtc}/{app}/{stream}?transport=tcp&{token_str}",
                 },
-                "llhls": {"llhls": f"{self.base_llhls}/{app}/{stream}/llhls.m3u8"}
+                "llhls": {"llhls": f"{self.base_llhls}/{app}/{stream}/llhls.m3u8?{token_str}"}
             }.get(publisher, {})
 
         apps = self.ome_api.get("vhosts/default/apps")
@@ -64,7 +65,7 @@ class StreamsController(SprongController):
                         },
                     }
                     if "thumbnail" in publishers:
-                        stream_result["thumbnail"] = f"{self.base_thumbs}/{app}/{stream}/thumb.png"
+                        stream_result["thumbnail"] = f"{self.base_thumbs}/{app}/{stream}/thumb.png?{token_str}"
                     result[f"{app}/{stream}"] = stream_result
                 except Exception as e:
                     dbg.append(f"{app}/{stream} error: {str(e)}")
