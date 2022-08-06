@@ -122,8 +122,8 @@ class SprongApplication:
         self.mappings.extend(new_mappings)
 
     def handle(self, environ, start_response):
+        req = Request(environ)
         try:
-            req = Request(environ)
             path = req.path
 
             for pattern, controller, handler in self.mappings:
@@ -143,6 +143,7 @@ class SprongApplication:
                 raise NotFound("Requested resource was not found")
 
         except HttpError as e:
+            LOGGER.debug("%s %s %s -> %s %s '%s'", req.method, req.path, req.query, e.code, e.status, str(e))
             start_response(f'{e.code} {e.status}', DEFAULT_HEADERS + JSON_HEADERS)
             return json.dumps({"message": str(e)}).encode('utf-8')
 
