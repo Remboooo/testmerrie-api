@@ -1,4 +1,5 @@
 import datetime
+import logging
 import secrets
 from dataclasses import dataclass
 
@@ -6,6 +7,9 @@ import requests
 from requests import HTTPError
 
 from sprong import sprongbean, Unauthorized, Request
+
+
+LOGGER = logging.getLogger(__name__)
 
 
 @dataclass
@@ -41,6 +45,9 @@ class DiscordAuth:
     def authenticate(self, req: Request):
         discord_token = req.authorization
         tm_token = req.get_query_param("token")
+
+        LOGGER.debug("Req tokens '%s'/'%s', token cache size = %d", discord_token, tm_token, len(self.token_cache))
+
         if not discord_token and not tm_token:
             raise Unauthorized("Missing Authorization header")
 
