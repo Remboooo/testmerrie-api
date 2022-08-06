@@ -72,7 +72,7 @@ class Request:
     def get_query_param_value_list(self, key) -> list[AnyStr]:
         return parse_qs(self.query).get(key) or []
 
-    def get_query_param(self, key) -> AnyStr | None:
+    def get_query_param(self, key) -> (AnyStr, None):
         val = self.get_query_param_value_list(key)
         if len(val) == 0:
             return None
