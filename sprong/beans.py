@@ -66,4 +66,6 @@ class SprongBeanRepo:
             else:
                 kwargs[param.name] = val
 
-        return creator(*args, **kwargs)
+        new_bean = creator(*args, **kwargs)
+        self.register(new_bean)
+        return new_bean
