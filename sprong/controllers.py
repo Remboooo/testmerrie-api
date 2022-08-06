@@ -79,6 +79,9 @@ class Request:
         else:
             return val[0]
 
+    def __str__(self):
+        return f"{self.method} {self.path}"
+
 
 def mapping(route):
     class Decorator:

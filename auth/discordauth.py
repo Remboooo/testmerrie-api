@@ -46,7 +46,7 @@ class DiscordAuth:
         discord_token = req.authorization
         tm_token = req.get_query_param("token")
 
-        LOGGER.debug("Req tokens '%s'/'%s', token cache size = %d", discord_token, tm_token, len(self.token_cache))
+        LOGGER.debug("Req %s tokens '%s'/'%s', token cache size = %d", req, discord_token, tm_token, len(self.token_cache))
 
         if not discord_token and not tm_token:
             raise Unauthorized("Missing Authorization header")
