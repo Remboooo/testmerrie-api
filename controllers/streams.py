@@ -32,7 +32,8 @@ class StreamsController(SprongController):
                     "webrtc-udp": f"{self.base_webrtc}/{app}/{stream}?{token_str}",
                     "webrtc-tcp": f"{self.base_webrtc}/{app}/{stream}?transport=tcp&{token_str}",
                 },
-                "llhls": {"llhls": f"{self.base_llhls}/{app}/{stream}/llhls.m3u8?{token_str}"}
+                "llhls": {"llhls": f"{self.base_llhls}/{app}/{stream}/llhls.m3u8?{token_str}"},
+                "hls": {"hls": f"{self.base_hls}/{app}/{stream}/playlist.m3u8?{token_str}"}
             }.get(publisher, {})
 
         apps = self.ome_api.get("vhosts/default/apps")
