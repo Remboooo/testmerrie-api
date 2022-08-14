@@ -58,12 +58,19 @@ class DiscordAuth:
         elif discord_token is None:
             raise Unauthorized("Unknown token")
 
-        me = self.discord_get("/users/@me", discord_token)
+        try:
+            me = self.discord_get("/users/@me", discord_token)
+        except HTTPError as e:
+            if e.response.status_code in (401, 403):
+                raise Unauthorized(f"Discord replied: {e.response.reason}")
+            else:
+                raise e
+
         member_of = {}
         for guild in self.allow_guilds.keys():
             try:
                 member_of[guild] = self.discord_get(f"/users/@me/guilds/{guild}/member", discord_token)
-            except HTTPError:
+            except HTTPError as e:
                 pass
 
         if not member_of:
