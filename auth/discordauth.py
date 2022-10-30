@@ -28,6 +28,7 @@ class DiscordAuth:
         self.client_secret = discord_config["clientSecret"]
         self.auth_cache_seconds = discord_config["authCacheSeconds"]
         self.allow_guilds = discord_config["allowGuilds"]
+        self.allowed_callback_uris = discord_config["allowedCallbackUris"]
         self.token_cache = {}
 
     def purge_old_tokens(self):
@@ -93,3 +94,38 @@ class DiscordAuth:
         self.token_cache[discord_token] = auth
         self.token_cache[auth.testmerrie_token] = auth
         return auth
+
+    def exchange_code_for_token(self, code, redirect_uri):
+        if redirect_uri not in self.allowed_callback_uris:
+            raise Unauthorized("Callback URI not allowed")
+        result = requests.get(
+            f"https://discord.com/api/oauth2/token",
+            data={
+                "client_id": self.client_id,
+                "client_secret": self.client_secret,
+                "grant_type": "authorization_code",
+                "code": code,
+                "redirect_uri": redirect_uri
+            },
+            headers={
+                "Content-Type": "application/x-www-form-urlencoded"
+            }
+        )
+        result.raise_for_status()
+        return result.json()
+
+    def refresh_token(self, refresh_token):
+        result = requests.get(
+            f"https://discord.com/api/oauth2/token",
+            data={
+                "client_id": self.client_id,
+                "client_secret": self.client_secret,
+                "grant_type": "refresh_token",
+                "refresh_token": refresh_token
+            },
+            headers={
+                "Content-Type": "application/x-www-form-urlencoded"
+            }
+        )
+        result.raise_for_status()
+        return result.json()
