@@ -98,7 +98,7 @@ class DiscordAuth:
     def exchange_code_for_token(self, code, redirect_uri):
         if redirect_uri not in self.allowed_callback_uris:
             raise Unauthorized("Callback URI not allowed")
-        result = requests.get(
+        result = requests.post(
             f"https://discord.com/api/oauth2/token",
             data={
                 "client_id": self.client_id,
@@ -115,7 +115,7 @@ class DiscordAuth:
         return result.json()
 
     def refresh_token(self, refresh_token):
-        result = requests.get(
+        result = requests.post(
             f"https://discord.com/api/oauth2/token",
             data={
                 "client_id": self.client_id,
