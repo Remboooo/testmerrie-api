@@ -8,6 +8,8 @@ from dataclasses import dataclass
 from typing import AnyStr
 from urllib.parse import parse_qs
 
+from requests import HTTPError
+
 LOGGER = logging.getLogger(__name__)
 
 MAPPINGS = defaultdict(list)
@@ -47,6 +49,11 @@ class NotFound(HttpError):
 class InternalServerError(HttpError):
     def __init__(self, msg):
         super().__init__(500, "Internal Server Error", msg)
+
+
+class ServiceUnavailableError(HttpError):
+    def __init__(self, msg):
+        super().__init__(503, "Service Unavailable", msg)
 
 
 @dataclass
@@ -101,6 +108,24 @@ def json_endpoint(func):
         result = func(self, environ, start_response, *args, **kwargs)
         start_response('200 OK', DEFAULT_HEADERS + JSON_HEADERS)
         return json.dumps(result).encode('utf-8')
+    return wrapper
+
+
+def using_upstream_service(func):
+    """
+    Catches requests.HTTPError and returns 503 Service Unavailable, in addition to logging the error response
+    """
+    @functools.wraps(func)
+    def wrapper(self, environ, start_response, *args, **kwargs):
+        try:
+            return func(self, environ, start_response, *args, **kwargs)
+        except HTTPError as e:
+            LOGGER.warning(
+                "Upstream request %s %s failed with %s '%s': %s",
+                e.request.method, e.request.url,
+                e.response.status_code, e.response.reason, e.response.text
+            )
+            raise ServiceUnavailableError("An upstream service failed")
     return wrapper
 
 
