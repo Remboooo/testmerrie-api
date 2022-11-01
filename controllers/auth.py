@@ -16,7 +16,7 @@ class AuthController(SprongController):
 
     @mapping(r"^/v1/refresh-token/?$")
     @json_endpoint
-    def token(self, req: Request, start_response):
+    def refresh_token(self, req: Request, start_response):
         refresh_token = req.get_query_param("refresh_token", required=True)
         return self.discord_auth.refresh_token(refresh_token)
 
