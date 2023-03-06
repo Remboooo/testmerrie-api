@@ -4,6 +4,17 @@ ovenMediaEngine:
   webRtcPublishUrl: "wss://bam.bad-bit.net/ome"
   llHlsPublishUrl: "https://bam.bad-bit.net/ome"
   thumbnailPublishUrl: "https://bam.bad-bit.net/ome"
+  webRtcPlaylist: "abr"
+  llHlsPlaylist: "llhls-abr.m3u8"
+  hlsPlaylist: "hls-abr.m3u8"
 discord:
   clientId: "... my client id ..."
   clientSecret: "... my client secret ..."
+  authCacheSeconds: 900
+  allowGuilds:
+    ... some guild id ...:
+      allowRoles:
+        - ... some role id ...
+  allowedCallbackUris:
+    - "http://localhost:3000/authcallback"
+    - "https://testmerrie.nl/authcallback"

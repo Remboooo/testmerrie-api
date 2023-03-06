@@ -16,6 +16,9 @@ class StreamsController(SprongController):
         self.base_webrtc = ome_config["webRtcPublishUrl"]
         self.base_llhls = ome_config["llHlsPublishUrl"]
         self.base_thumbs = ome_config["thumbnailPublishUrl"]
+        self.webrtc_playlist = ome_config["webRtcPlaylist"]
+        self.llhls_playlist = ome_config["llHlsPlaylist"]
+        self.hls_playlist = ome_config["hlsPlaylist"]
 
     @mapping('^/v1/streams/?$')
     @json_endpoint
@@ -29,13 +32,11 @@ class StreamsController(SprongController):
         def get_outputs(app, stream, publisher):
             return {
                 "webrtc": {
-                    # "webrtc-udp": f"{self.base_webrtc}/{app}/{stream}?{token_str}",
-                    # "webrtc-tcp": f"{self.base_webrtc}/{app}/{stream}?transport=tcp&{token_str}",
-                    "webrtc-udp": f"{self.base_webrtc}/{app}/{stream}/abr?{token_str}",
-                    "webrtc-tcp": f"{self.base_webrtc}/{app}/{stream}/abr?transport=tcp&{token_str}",
+                    "webrtc-udp": f"{self.base_webrtc}/{app}/{stream}/{self.webrtc_playlist}?{token_str}",
+                    "webrtc-tcp": f"{self.base_webrtc}/{app}/{stream}/{self.webrtc_playlist}?transport=tcp&{token_str}",
                 },
-                "llhls": {"llhls": f"{self.base_llhls}/{app}/{stream}/llhls.m3u8?{token_str}"},
-                "hls": {"hls": f"{self.base_llhls}/{app}/{stream}/playlist.m3u8?{token_str}"}
+                "llhls": {"llhls": f"{self.base_llhls}/{app}/{stream}/{self.llhls_playlist}?{token_str}"},
+                "hls": {"hls": f"{self.base_llhls}/{app}/{stream}/{self.hls_playlist}?{token_str}"}
             }.get(publisher, {})
 
         apps = self.ome_api.get("vhosts/default/apps")
