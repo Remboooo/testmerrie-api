@@ -1,5 +1,6 @@
 import logging
 import os
+from argparse import ArgumentParser
 
 import yaml
 
@@ -30,9 +31,22 @@ class Bami(SprongApplication):
         self.add_controller(self.repo.get(AuthController))
 
 
-logging.basicConfig(level=logging.DEBUG)
 application = Bami()
 
 if __name__ == '__main__':
-    print(application({"REQUEST_METHOD": "GET", "PATH_INFO": "/v1/auth/"}, lambda *args: print(args)))
-    print(application({"REQUEST_METHOD": "GET", "PATH_INFO": "/v1/auth/", "QUERY_STRING": "token=bla&wut"}, lambda *args: print(args)))
+    from wsgiref.simple_server import make_server
+    argparse = ArgumentParser()
+    argparse.add_argument("-p", "--port", type=int, default=8080, help="Server port")
+    argparse.add_argument("-H", "--host", default="127.0.0.1", help="Serve address")
+    argparse.add_argument("-v", "--verbose", action='store_true', help="Verbose mode (debug logging)")
+    args = argparse.parse_args()
+    port = args.port
+    host = args.host
+
+    logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO)
+
+    with make_server(host, port, application) as httpd:
+        print(f"Serving on {host}:{port}")
+        httpd.serve_forever()
+else:
+    logging.basicConfig(level=logging.DEBUG)

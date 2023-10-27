@@ -162,7 +162,13 @@ class SprongApplication:
                         return self.preflight_response(req, start_response)
                     else:
                         try:
-                            return handler(controller, Request(env=environ), start_response)
+                            response = handler(controller, Request(env=environ), start_response)
+                            if response is None:
+                                return []
+                            elif isinstance(response, bytes):
+                                return [response]
+                            else:
+                                return response
                         except Exception as e:
                             if isinstance(e, HttpError):
                                 raise e
@@ -175,7 +181,8 @@ class SprongApplication:
         except HttpError as e:
             LOGGER.debug("%s %s %s -> %s %s '%s'", req.method, req.path, req.query, e.code, e.status, str(e))
             start_response(f'{e.code} {e.status}', DEFAULT_HEADERS + JSON_HEADERS)
-            return json.dumps({"message": str(e)}).encode('utf-8')
+            return [json.dumps({"message": str(e)}).encode('utf-8')]
 
     def preflight_response(self, req: Request, start_response):
         start_response('204 OK', DEFAULT_HEADERS + JSON_HEADERS)
+        return []
