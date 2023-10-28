@@ -1,0 +1,170 @@
+{
+  "message": "OK",
+  "response": {
+    "dynamic": false,
+    "name": "bam",
+    "outputProfiles": {
+      "hardwareAcceleration": "true",
+      "outputProfile": [
+        {
+          "encodes": {
+            "audios": [
+              {
+                "bitrate": "64000",
+                "channel": "2",
+                "codec": "opus",
+                "name": "opus",
+                "samplerate": "48000"
+              },
+              {
+                "bypass": "true",
+                "name": "bypass_audio"
+              }
+            ],
+            "images": [
+              {
+                "codec": "png",
+                "framerate": ".2",
+                "height": "720"
+              }
+            ],
+            "videos": [
+              {
+                "bypass": "true",
+                "name": "bypass_video"
+              },
+              {
+                "bitrate": "3500000",
+                "codec": "h264",
+                "framerate": "30",
+                "height": "720",
+                "name": "video_720",
+                "preset": "medium"
+              },
+              {
+                "bitrate": "1500000",
+                "codec": "h264",
+                "framerate": "30",
+                "height": "480",
+                "name": "video_480",
+                "preset": "medium"
+              }
+            ]
+          },
+          "name": "bypass",
+          "outputStreamName": "${OriginStreamName}",
+          "playlists": [
+            {
+              "fileName": "abr",
+              "name": "ABR",
+              "options": {
+                "webRtcAutoAbr": "true"
+              },
+              "renditions": [
+                {
+                  "audio": "bypass_audio",
+                  "name": "Bypass",
+                  "video": "bypass_video"
+                },
+                {
+                  "audio": "opus",
+                  "name": "Bypass+opus",
+                  "video": "bypass_video"
+                },
+                {
+                  "audio": "opus",
+                  "name": "720p",
+                  "video": "video_720"
+                },
+                {
+                  "audio": "opus",
+                  "name": "480p",
+                  "video": "video_480"
+                }
+              ]
+            },
+            {
+              "fileName": "original",
+              "name": "original",
+              "renditions": [
+                {
+                  "audio": "bypass_audio",
+                  "name": "Bypass",
+                  "video": "bypass_video"
+                },
+                {
+                  "audio": "opus",
+                  "name": "Bypass+opus",
+                  "video": "bypass_video"
+                }
+              ]
+            },
+            {
+              "fileName": "720",
+              "name": "720",
+              "renditions": [
+                {
+                  "audio": "opus",
+                  "name": "720",
+                  "video": "video_720"
+                }
+              ]
+            },
+            {
+              "fileName": "480",
+              "name": "480",
+              "renditions": [
+                {
+                  "audio": "opus",
+                  "name": "480",
+                  "video": "video_480"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "providers": {
+      "ovt": {},
+      "rtmp": {},
+      "srt": {},
+      "webrtc": {
+        "timeout": "30000"
+      }
+    },
+    "publishers": {
+      "appWorkerCount": "1",
+      "hls": {
+        "crossDomains": [
+          "*"
+        ],
+        "segmentCount": "2",
+        "segmentDuration": "4"
+      },
+      "llhls": {
+        "chunkDuration": "1",
+        "crossDomains": [
+          "*"
+        ],
+        "segmentCount": "4",
+        "segmentDuration": "1"
+      },
+      "ovt": {},
+      "streamWorkerCount": "2",
+      "thumbnail": {
+        "crossDomains": [
+          "*"
+        ]
+      },
+      "webrtc": {
+        "jitterBuffer": "true",
+        "rtx": "true",
+        "timeout": "30000",
+        "ulpfec": "true"
+      }
+    },
+    "type": "live"
+  },
+  "statusCode": 200
+}

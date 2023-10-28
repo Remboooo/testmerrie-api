@@ -1,0 +1,131 @@
+{
+  "message": "OK",
+  "response": {
+    "input": {
+      "createdTime": "2023-10-27T22:38:21.270+02:00",
+      "sourceType": "Rtmp",
+      "sourceUrl": "TCP://192.168.0.10:62957",
+      "tracks": [
+        {
+          "id": 0,
+          "name": "Video",
+          "type": "Video",
+          "video": {
+            "bitrate": "8000000",
+            "bypass": false,
+            "codec": "H264",
+            "framerate": 60.0,
+            "hasBframes": false,
+            "height": 1080,
+            "keyFrameInterval": 60,
+            "width": 1920
+          }
+        },
+        {
+          "audio": {
+            "bitrate": "160000",
+            "bypass": false,
+            "channel": 2,
+            "codec": "AAC",
+            "samplerate": 48000
+          },
+          "id": 1,
+          "name": "Audio",
+          "type": "Audio"
+        },
+        {
+          "id": 2,
+          "name": "Data",
+          "type": "Data"
+        }
+      ]
+    },
+    "name": "rem",
+    "outputs": [
+      {
+        "name": "rem",
+        "tracks": [
+          {
+            "id": 0,
+            "name": "bypass_video",
+            "type": "Video",
+            "video": {
+              "bypass": true
+            }
+          },
+          {
+            "id": 1,
+            "name": "video_720",
+            "type": "Video",
+            "video": {
+              "bitrate": "3500000",
+              "bypass": false,
+              "codec": "H264",
+              "framerate": 30.0,
+              "hasBframes": false,
+              "height": 720,
+              "keyFrameInterval": 0,
+              "width": 1280
+            }
+          },
+          {
+            "id": 2,
+            "name": "video_480",
+            "type": "Video",
+            "video": {
+              "bitrate": "1500000",
+              "bypass": false,
+              "codec": "H264",
+              "framerate": 30.0,
+              "hasBframes": false,
+              "height": 480,
+              "keyFrameInterval": 0,
+              "width": 854
+            }
+          },
+          {
+            "id": 3,
+            "name": "image_0",
+            "type": "Video",
+            "video": {
+              "bitrate": "0",
+              "bypass": false,
+              "codec": "PNG",
+              "framerate": 0.20000000298023224,
+              "hasBframes": false,
+              "height": 720,
+              "keyFrameInterval": 0,
+              "width": 1280
+            }
+          },
+          {
+            "audio": {
+              "bitrate": "64000",
+              "bypass": false,
+              "channel": 2,
+              "codec": "OPUS",
+              "samplerate": 48000
+            },
+            "id": 4,
+            "name": "opus",
+            "type": "Audio"
+          },
+          {
+            "audio": {
+              "bypass": true
+            },
+            "id": 5,
+            "name": "bypass_audio",
+            "type": "Audio"
+          },
+          {
+            "id": 6,
+            "name": "Data",
+            "type": "Data"
+          }
+        ]
+      }
+    ]
+  },
+  "statusCode": 200
+}
