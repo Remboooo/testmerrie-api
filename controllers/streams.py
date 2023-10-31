@@ -26,62 +26,6 @@ class StreamsController(SprongController):
         dbg = []
         result = {}
 
-        def get_outputs(app, stream, publisher):
-            return {
-                "webrtc": {
-                    "webrtc-udp": f"{self.base_webrtc}/{app}/{stream}/{self.webrtc_playlist}?{token_str}",
-                    "webrtc-tcp": f"{self.base_webrtc}/{app}/{stream}/{self.webrtc_playlist}?transport=tcp&{token_str}",
-                },
-                "llhls": {"llhls": f"{self.base_llhls}/{app}/{stream}/{self.llhls_playlist}?{token_str}"},
-                "hls": {"hls": f"{self.base_llhls}/{app}/{stream}/{self.hls_playlist}?{token_str}"}
-            }.get(publisher, {})
-
-        apps = self.ome_api.get("vhosts/default/apps")
-        for app in apps:
-            app_details = self.ome_api.get(f"vhosts/default/apps/{app}")
-            publishers = list(app_details["publishers"].keys())
-            streams = self.ome_api.get(f"vhosts/default/apps/{app}/streams")
-            for stream in streams:
-                try:
-                    stream_details = self.ome_api.get(f"vhosts/default/apps/{app}/streams/{stream}")
-                    video_track = [t for t in stream_details["input"]["tracks"] if "video" in t][0]["video"]
-                    audio_track = [t for t in stream_details["input"]["tracks"] if "audio" in t][0]["audio"]
-                    stream_result = {
-                        "name": stream,
-                        "streams": {
-                            "main": {"protocols": combine_dicts(*(get_outputs(app, stream, p) for p in publishers))}},
-                        "created": stream_details["input"]["createdTime"],
-                        "video": {
-                            "width": video_track.get("width"),
-                            "height": video_track.get("height"),
-                            "codec": video_track.get("codec"),
-                            "bitrate": video_track.get("bitrate"),
-                            "framerate": video_track.get("framerate"),
-                        },
-                        "audio": {
-                            "bitrate": audio_track.get("bitrate"),
-                            "codec": audio_track.get("codec"),
-                            "channels": audio_track.get("channels"),
-                            "samplerate": audio_track.get("samplerate"),
-                        },
-                    }
-                    if "thumbnail" in publishers:
-                        stream_result["thumbnail"] = f"{self.base_thumbs}/{app}/{stream}/thumb.png?{token_str}"
-                    result[f"{app}/{stream}"] = stream_result
-                except Exception as e:
-                    dbg.append(f"{app}/{stream} error: {str(e)}")
-
-        return {"streams": result, "dbg": dbg}
-
-    @mapping('^/v2/streams/?$')
-    @json_endpoint
-    def serve(self, req: Request, start_response):
-        auth = self.discord_auth.authenticate(req)
-        token_str = f"token={auth.testmerrie_token}"
-
-        dbg = []
-        result = {}
-
         def get_outputs(app, stream, publisher, playlist):
             return {
                 "webrtc": {
