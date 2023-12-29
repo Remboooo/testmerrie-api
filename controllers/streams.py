@@ -41,14 +41,14 @@ class StreamsController(SprongController):
             result = {}
             for output in stream_details["outputs"]:
                 name = output["name"]
-                video_out_heights = {t["name"]: t.get("video", {}).get("height", video_in_height) for t in output["tracks"] if "video" in t}
+                #video_out_heights = {t["name"]: t.get("video", {}).get("height", video_in_height) for t in output["tracks"] if "video" in t}
                 for playlist in app_details["outputProfiles"]["outputProfile"][0]["playlists"]:
-                    video_heights = set(video_out_heights[rendition["video"]] for rendition in playlist["renditions"])
-                    name = f"{list(video_heights)[0]}p" if len(video_heights) == 1 else "abr"
-                    result[name] = {}
+                    #video_heights = set(video_out_heights[rendition["video"]] for rendition in playlist["renditions"])
+                    #name = f"{list(video_heights)[0]}p" if len(video_heights) == 1 else "abr"
+                    result[playlist["name"]] = {}
                     for publisher in publishers:
                         # second param: stream name or output name?
-                        result[name].update(get_outputs(app, stream, publisher, playlist))
+                        result[playlist["name"]].update(get_outputs(app, stream, publisher, playlist))
             return result
 
         apps = self.ome_api.get("vhosts/default/apps")
