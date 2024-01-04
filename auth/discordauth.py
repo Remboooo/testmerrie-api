@@ -30,6 +30,7 @@ class DiscordAuth:
         self.allow_guilds = discord_config["allowGuilds"]
         self.allowed_callback_uris = discord_config["allowedCallbackUris"]
         self.token_cache = {}
+        self._session = requests.Session()
 
     def purge_old_tokens(self):
         for key in list(self.token_cache.keys()):
@@ -37,7 +38,7 @@ class DiscordAuth:
                 del self.token_cache[key]
 
     def discord_get(self, path, token):
-        result = requests.get(f"https://discord.com/api/{path}", headers={
+        result = self._session.get(f"https://discord.com/api/{path}", headers={
             "Authorization": token
         })
         result.raise_for_status()
