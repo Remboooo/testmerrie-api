@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from typing import AnyStr
 from urllib.parse import parse_qs
 
-from requests import HTTPError
+from requests import HTTPError, RequestException
 
 LOGGER = logging.getLogger(__name__)
 
@@ -16,7 +16,7 @@ MAPPINGS = defaultdict(list)
 
 DEFAULT_HEADERS = [
     ('Access-Control-Allow-Origin', '*'),
-    ('Access-Control-Allow-Headers', '*')
+    ('Access-Control-Allow-Headers', '*,Authorization')
 ]
 
 JSON_HEADERS = [
@@ -124,6 +124,12 @@ def using_upstream_service(func):
                 "Upstream request %s %s failed with %s '%s': %s",
                 e.request.method, e.request.url,
                 e.response.status_code, e.response.reason, e.response.text
+            )
+            raise ServiceUnavailableError("An upstream service failed")
+        except RequestException as e:
+            LOGGER.warning(
+                "Upstream request %s %s failed with %s",
+                e.request.method, e.request.url, str(e)
             )
             raise ServiceUnavailableError("An upstream service failed")
     return wrapper
