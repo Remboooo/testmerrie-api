@@ -83,7 +83,7 @@ class StreamsController(SprongController):
                         },
                     }
                     if "thumbnail" in publishers:
-                        stream_result["thumbnail"] = f"{self.base_thumbs}/{app}/{stream}/thumb.png?{token_str}"
+                        stream_result["thumbnail"] = f"{self.base_thumbs}/{app}/{stream}/thumb.jpg?{token_str}"
                     result[f"{app}/{stream}"] = stream_result
                 except Exception as e:
                     dbg.append(f"{app}/{stream} error: {str(e)}")
