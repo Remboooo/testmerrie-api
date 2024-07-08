@@ -61,9 +61,12 @@ class StreamsController(SprongController):
                     stream_details = self.ome_api.get(f"vhosts/default/apps/{app}/streams/{stream}")
                     video_track = [t for t in stream_details["input"]["tracks"] if "video" in t][0]["video"]
                     audio_track = [t for t in stream_details["input"]["tracks"] if "audio" in t][0]["audio"]
+                    stream_streams = get_streams(app, app_details, stream, stream_details, publishers)
+                    if not stream_streams:
+                        continue
                     stream_result = {
                         "name": stream,
-                        "streams": get_streams(app, app_details, stream, stream_details, publishers),
+                        "streams": stream_streams,
                         "created": stream_details["input"]["createdTime"],
                         "video": {
                             "width": video_track.get("width"),
