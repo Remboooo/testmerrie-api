@@ -16,6 +16,7 @@ class StreamsController(SprongController):
         self.base_webrtc = ome_config["webRtcPublishUrl"]
         self.base_hls = ome_config["hlsPublishUrl"]
         self.base_thumbs = ome_config["thumbnailPublishUrl"]
+        self.idle_stream_url = ome_config.get("idleStreamUrl")
 
     @mapping('^/v1/streams/?$')
     @json_endpoint
@@ -57,6 +58,8 @@ class StreamsController(SprongController):
             publishers = list(app_details["publishers"].keys())
             streams = self.ome_api.get(f"vhosts/default/apps/{app}/streams")
             for stream in streams:
+                if stream.startswith("_"):
+                    continue
                 try:
                     stream_details = self.ome_api.get(f"vhosts/default/apps/{app}/streams/{stream}")
                     video_track = [t for t in stream_details["input"]["tracks"] if "video" in t][0]["video"]
@@ -88,4 +91,9 @@ class StreamsController(SprongController):
                 except Exception as e:
                     dbg.append(f"{app}/{stream} error: {str(e)}")
 
-        return {"streams": result, "dbg": dbg}
+        result = {"streams": result, "dbg": dbg}
+
+        if self.idle_stream_url:
+            result["idleStream"] = {"url": f"{self.idle_stream_url}?{token_str}"}
+
+        return result
