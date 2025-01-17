@@ -49,4 +49,4 @@ if __name__ == '__main__':
         print(f"Serving on {host}:{port}")
         httpd.serve_forever()
 else:
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig()
